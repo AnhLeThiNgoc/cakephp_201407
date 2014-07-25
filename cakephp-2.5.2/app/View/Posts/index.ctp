@@ -5,6 +5,14 @@
     'Add Post',
     array('controller' => 'posts', 'action' => 'add')
 ); ?>
+<?php if($username === 'admin'):?>
+<?php 
+    echo '&nbsp&nbsp&nbsp';
+    echo $this->Html->link('Add Group', array('controller' => 'groups', 'action' => 'add'));
+    echo '&nbsp&nbsp&nbsp';
+    echo $this->Html->link('Users', array('controller' => 'users', 'action' => 'index'));
+?>
+<?php endif; ?>
 <table>
     <tr>
         <th>Id</th>
@@ -22,9 +30,11 @@
             <?php echo $this->Html->link($post['Post']['title'],array('controller' => 'posts', 'action' => 'view', $post['Post']['id'])); ?>
         </td>
         <td>
-        	<?php echo $this->Html->link('View', array('action' => 'edit', $post['Post']['id'])); 
+        <?php if($username === 'admin'):?>
+        	<?php echo $this->Html->link('Edit', array('action' => 'edit', $post['Post']['id'])); 
         		echo "&nbsp&nbsp&nbsp".$this->Form->postLink('Delete', array('action' => 'delete', $post['Post']['id']), array('confirm' => 'Are you sure?'));
         	?>
+        <?php endif; ?>
         </td>
         <td><?php echo $post['Post']['created']; ?></td>
     </tr>

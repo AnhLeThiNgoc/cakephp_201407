@@ -19,7 +19,7 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-App::uses('Controller', 'Controller');
+App::uses('Controller', 'Controller','Component');
 
 /**
  * Application Controller
@@ -31,4 +31,56 @@ App::uses('Controller', 'Controller');
  * @link		http://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+    
+	public $components = array(
+        // 'ControllerList',
+        // 'Acl',
+        'Session',
+        'Auth' => array(
+            'loginRedirect' => array(
+                'controller' => 'posts',
+                'action' => 'index'
+            ),
+            'logoutRedirect' => array(
+                'controller' => 'pages',
+                'action' => 'display',
+                'home'
+            )
+        )
+    );
+
+    public function beforeFilter() {
+        $this->Auth->allow('index', 'view');
+        $this->set('username', $this->_username());
+        $this->set('logged_in', $this->_loggedIn());
+
+        $this->Auth->isAuthorized = 'actions';
+        $this->Auth->loginAction = array('controller' => 'users', 'action' => 'login');
+        $this->Auth->logoutRedirect = array('controller' =>'users', 'action' => 'login');
+        $this->Auth->loginRedirect = array('controller' => 'posts', 'action' => 'add');
+    }
+
+    public function isAuthorized($user) {
+    	//admin can access every action
+    	if(isset($user['role']) && $user['role'] === 'admin') {
+    		return true;
+    	}
+    	return false;
+    }
+    // lay thong tin user current
+    function _loggedIn() {
+    	$logged_in = false;
+    	if($this->Auth->user()) {
+    		$logged_in = true;
+    	}
+    	return $logged_in;
+    }
+
+    function _username() {
+    	$username = null;
+    	if($this->Auth->user()) {
+    		$username = $this->Auth->user('username');
+    	}
+    	return $username;
+    }
 }
